@@ -5,12 +5,13 @@ class TetrisShape {
   TetrisShape({this.shapename, this.positions});
 }
  // Making the 0 position farthest left, the 1 position farthest right, the 2 postion highest, 3 position lowest, and 4+ others
-final linepositions = [[-10, 10, 0, 20],[-1, 2, 0, 2]];
+final linepositions = [[-10, 10, 0, 20],[-1, 2, 0, 1]];
 final Tpositions = [[ -1, 1, 0, 10],[ -1, 0, -10, 10], [ -1, 1, -10, 0],[ 0, 1, -10, 10]];
 final Zpositions = [[-1, -9, -10, 0],[0, 1, -10, 11]];
-final Lpositions = [[-10, 1, 0, -20], [0, 2, 1,  10], [-1, 0, 10, 20],[-2, 0, -1, -10]];
-final littleLpositions = [[0, 1, 0, -10],[0, 1, 0, 10],[ -1, 0, 10, 0], [ -1, 0, 0, -10]];
+final Lpositions = [[-10, 1,  -20, 0], [0, 2, 1,  10], [-1, 10, 0, 20],[-2, 0, -10, -1]];
+final littleLpositions = [[0, 1, -10, 0],[0, 1, 0, 10],[ -1, 0,  0, 10], [ -1, 0, -10, 0]];
 final squarepositions =  [[0, -9, -10, 1]];
+final shapepositions = [linepositions, Tpositions, Zpositions, Lpositions, littleLpositions, squarepositions];
 // shape possibilities
  /*
  Line poss relative to center 1 standing [-10, 0, 10, 20]
