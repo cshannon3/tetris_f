@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tetris_f/controller.dart';
+import 'package:tetris_f/shared.dart';
 import 'model.dart';
 import 'dart:math';
 
@@ -79,20 +81,36 @@ class _MyHomePageState extends State<MyHomePage> {
       case (Movement.down):
         if ((currentShapePositions[rotationint][3]+rootposition+10) <120 ){
           rootposition +=10;
-          if (currentShapePositions[rotationint][3]+rootposition >109){
-            boxes2 = [];
-            setState(() {
-              currentShapePositions[rotationint].forEach((val) {
-                boxes2.add(val + rootposition);
-              });
+            bool landed = false;
+            currentShapePositions[rotationint].forEach((v) {
+              if (!landed && taken.contains(v+rootposition)){
+                landed = true;
+                nextbox();
+              }
             });
-            nextbox();
-          }else if (taken.contains(currentShapePositions[rotationint][3]+rootposition)){
-            nextbox();
-          }
+
+        if (!landed && currentShapePositions[rotationint][3]+rootposition >109){
+          boxes2 = [];
+          setState(() {
+            currentShapePositions[rotationint].forEach((val) {
+              boxes2.add(val + rootposition);
+            });
+          });
+          nextbox();
+        }
         }
         break;
       case (Movement.rotate):
+        int newrotationint = 0;
+        if (currentShapePositions.length> rotationint+1) {
+          newrotationint = rotationint+1;
+        }
+        if ((currentShapePositions[newrotationint][0]+rootposition+1)%10 != 0
+            && (currentShapePositions[newrotationint][1]+rootposition)%10 !=0 ){
+            setState(() {
+              rotationint = newrotationint;
+            });
+        }
         break;
       default:
         break;
@@ -145,70 +163,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
           ),
         ),
-        Container(
-          height: 70.0,
-          width: double.infinity,
-          color: Colors.red,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  setState(() {
-                    refreshboxes2(Movement.left);
-                  });
-                },
-                iconSize: 40.0,
-              ),
-              IconButton(
-                icon: Icon(Icons.arrow_upward),
-                onPressed: () {
-                  setState(() {
-                    refreshboxes2(Movement.up);
-                  });
-
-                },
-                color: Colors.green,
-                iconSize: 40.0,
-              ),
-              IconButton(
-                icon: Icon(Icons.refresh),
-                onPressed: () {
-                  setState(() {
-                    if (currentShapePositions.length> rotationint+1) {
-                      rotationint+=1;
-                    }else{
-                      rotationint = 0;
-                    }
-                    refreshboxes2(Movement.rotate);
-                  });
-
-                },
-                color: Colors.green,
-                iconSize: 40.0,
-              ),
-              IconButton(
-                icon: Icon(Icons.arrow_downward),
-                onPressed: () {
-                  setState(() {
-                    refreshboxes2(Movement.down);
-                  });
-                },
-                iconSize: 40.0,
-              ),
-              IconButton(
-                icon: Icon(Icons.arrow_forward_ios),
-                onPressed: () {
-                  setState(() {
-                    refreshboxes2(Movement.right);
-                  });
-                },
-                iconSize: 40.0,
-              ),
-            ],
-          ),
-        )
+        Controller(move: (m) {
+          setState(() {
+            refreshboxes2(m);
+          });
+        }, ),
       ],
    
       
@@ -217,14 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 
-enum Movement {
-  left,
-  right,
-  up,
-  down,
-  rotate,
-  init,
-}
+
 
 
 class boardTile extends StatelessWidget {
