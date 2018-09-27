@@ -87,6 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
               });
             });
             nextbox();
+          }else if (taken.contains(currentShapePositions[rotationint][3]+rootposition)){
+            nextbox();
           }
         }
         break;
