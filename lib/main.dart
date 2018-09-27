@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
       ),
       home: new Scaffold(
       appBar: new AppBar(
-
     ),
     body: new MyHomePage(),
       ),
@@ -32,21 +31,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double paddingtop;
   double paddingbottom;
-  List<int> highlightedboxes;
-  bool hitbottom = false;
-  bool hitleft = false;
-  bool hitright = false;
-  bool hittop = false;
   int rootposition = 15;
   int rotationint = 0;
   List<int> boxes2 = [];
-
 
   @override
   void initState() {
     paddingtop = 100.0;
     paddingbottom = 100.0;
-    highlightedboxes = [11,21,31];
 
     refreshboxes2(Movement.init);
   }
@@ -104,9 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: List.generate(120, (index) {
                   return Container(
                     decoration: BoxDecoration(
-                      color: highlightedboxes.contains(index)
-                          ? Colors.green
-                          : boxes2.contains(index) ?
+                      color: boxes2.contains(index) ?
                         Colors.red
                        : Colors.grey,
                       borderRadius: BorderRadius.circular(3.0),
@@ -140,20 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     refreshboxes2(Movement.left);
                   });
-                  List<int> newboxpositions = [];
-                  highlightedboxes.forEach((boxval) {
-                    if (hitleft || (boxval)%10 == 0 ){
-                      hitleft = true;
-                    } else {
-                      newboxpositions.add(boxval-1);
-                    }
-                  });
-                  if (!hitleft) {
-                    setState(() {
-                      hitright = false;
-                      highlightedboxes = newboxpositions;
-                    });
-                  }
+
                 },
                 iconSize: 40.0,
               ),
@@ -163,20 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() {
                     refreshboxes2(Movement.up);
                   });
-                    List<int> newboxpositions = [];
-                    highlightedboxes.forEach((boxval) {
-                      if (hittop || boxval - 10 < 0){
-                        hittop = true;
-                      } else {
-                        newboxpositions.add(boxval - 10);
-                      }
-                    });
-                    if (!hittop) {
-                      setState(() {
-                        hitbottom = false;
-                        highlightedboxes = newboxpositions;
-                      });
-                    }
+
                 },
                 color: Colors.green,
                 iconSize: 40.0,
@@ -192,20 +156,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
                     refreshboxes2(Movement.rotate);
                   });
-                  setState(() {
-                    // going from standing to laying so top and bottom should become false
-                    if (highlightedboxes[1] - highlightedboxes[0]>3 ){
-                      if(!hitleft && !hitright){
-    highlightedboxes[0] = highlightedboxes[1] - 1;
-    highlightedboxes[2] = highlightedboxes[1] + 1;
-    hittop = false; hitbottom = false;
-    }
-                  }else if (!hittop && !hitbottom){
-                    highlightedboxes[0] = highlightedboxes[1] -10;
-                    highlightedboxes[2] = highlightedboxes[1]+10;
-                    hitleft = false; hitright = false;
-                  }
-                    });
 
                 },
                 color: Colors.green,
@@ -217,20 +167,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() {
                     refreshboxes2(Movement.down);
                   });
-                  List<int> newboxpositions = [];
-                  highlightedboxes.forEach((boxval) {
-                    if (hitbottom || boxval + 10 > 120){
-                      hitbottom = true;
-                    } else {
-                      newboxpositions.add(boxval + 10);
-                    }
-                  });
-                  if (!hitbottom) {
-                    setState(() {
-                      hittop = false;
-                      highlightedboxes = newboxpositions;
-                    });
-                  }
                 },
                 iconSize: 40.0,
               ),
@@ -240,20 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() {
                     refreshboxes2(Movement.right);
                   });
-                  List<int> newboxpositions = [];
-                  highlightedboxes.forEach((boxval) {
-                    if (hitright || (boxval+1)%10 == 0 ){
-                      hitright = true;
-                    } else {
-                      newboxpositions.add(boxval+1);
-                    }
-                  });
-                  if (!hitright) {
-                    setState(() {
-                      hitleft = false;
-                      highlightedboxes = newboxpositions;
-                    });
-                  }
+
                 },
 
                 iconSize: 40.0,

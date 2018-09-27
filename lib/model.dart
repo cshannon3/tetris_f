@@ -3,7 +3,6 @@ class TetrisShape {
   final List<List<int>> positions;
 
   TetrisShape({this.shapename, this.positions});
-
 }
  // Making the 0 position farthest left, the 1 position farthest right, the 2 postion highest, 3 position lowest, and 4+ others
 final linepositions = [[-10, 10, 0, 20],[-1, 2, 0, 2]];
