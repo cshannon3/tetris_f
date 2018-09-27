@@ -41,7 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int initrootposition = 15;
   int rotationint = 0;
   List<int> boxes2 = [];
-  List<int> taken = [];
   List<List<int>> taken2 = List.generate(12, (i) => []);
   List<int> filledboxesperrow = new List<int>.generate(12, (i) => 0 );
   List<List<int>> currentShapePositions;
@@ -54,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print(filledboxesperrow);
     paddingbottom = 100.0;
     Random random = new Random();
-    currentShapePositions = shapepositions[random.nextInt(shapepositions.length-1)];
+    currentShapePositions = shapepositions[random.nextInt(shapepositions.length)];
     currentrootposition = initrootposition;
     refreshboxes2(Movement.init);
     timer?.cancel(); // cancel old timer if it exists
@@ -94,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
           currentrootposition +=10;
             bool landed = false;
             currentShapePositions[rotationint].forEach((v) {
-              if (!landed && taken.contains(v+currentrootposition)){
+              if (!landed && taken2[((v+currentrootposition)/10).floor()].contains((v+currentrootposition)%10)){
                 landed = true;
                 nextbox();
               }
@@ -139,38 +138,44 @@ class _MyHomePageState extends State<MyHomePage> {
     Random random = new Random();
     currentShapePositions = shapepositions[random.nextInt(shapepositions.length-1)];
     setState(() {
-      taken.addAll(boxes2);
+      //taken.addAll(boxes2);
       List<int> checkrepeats = [];
+      List<int> erasetheserows = [];
       boxes2.forEach((val) {
+        taken2[(val/10).floor()].add(val%10);
         if(!checkrepeats.contains(val)) {
-          filledboxesperrow[(val / 10).toInt()] += 1;
+          filledboxesperrow[(val / 10).floor()] += 1;
           checkrepeats.add(val);
-        }
-        if (filledboxesperrow[(val/10).toInt()] ==10) {
-          eraserow(filledboxesperrow[(val/10).toInt()]);
-          print((val/10).toInt());
+          if (filledboxesperrow[(val / 10).floor()] == 10) {
+            // filledboxesperrow[(val/10).floor()] =0;
+            erasetheserows.add((val / 10).floor());
+            //eraserow(filledboxesperrow[(val / 10).floor()]);
+            print((val / 10).floor());
+          }
         }
       });
-      print(filledboxesperrow);
+      if (erasetheserows.isNotEmpty) eraserows(erasetheserows);
       currentrootposition = initrootposition;
       rotationint = 0;
     });
   }
 
-  eraserow(int rownum){
-    filledboxesperrow.removeAt(rownum+1);
-    filledboxesperrow.insert(0, 0);
-    List<int> newtaken = [];
-    taken.forEach((i){
-      if ((i/10).toInt() < rownum+1) {
-        newtaken.add(i + 10);
-      }else if ((i/10).toInt() > rownum+1){
-        newtaken.add(i);
-      }
-    });
+  eraserows(List<int> rownums){
+    print("ROw nums");
+    print(rownums);
     setState(() {
-      taken = newtaken;
-    print(taken);
+        filledboxesperrow.removeRange(rownums.first, rownums.last);
+        filledboxesperrow.insertAll(0, List.generate(rownums.length, (i) =>0));
+
+      //  print(taken2.last);
+        print(rownums.first);
+        print(rownums.last);
+        taken2.removeRange(rownums.first, rownums.last);
+        taken2.insertAll(0, List.generate(rownums.length, (i) =>[]));
+    print("taken2");
+    print(taken2);
+    print("filledboxes");
+    print(filledboxesperrow);
     });
   }
   @override
@@ -194,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     decoration: BoxDecoration(
                       color: boxes2.contains(index) ?
                         Colors.red
-                       : taken.contains(index) ?
+                       : taken2[(index/10).floor()].contains(index%10) ?
                         Colors.green :
                       Colors.grey,
                       borderRadius: BorderRadius.circular(3.0),
@@ -202,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     child: Center(
                       child: Text(
-                        '$index',
+                        '${index}',
                       ),
                     ),
                   );
@@ -220,20 +225,6 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         }, ),
       ],
-   
-      
     );
-  }
-}
-
-
-
-
-
-class boardTile extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return new Container();
   }
 }
