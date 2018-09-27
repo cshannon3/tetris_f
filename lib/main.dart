@@ -51,6 +51,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     paddingtop = 100.0;
     print(filledboxesperrow);
+    List<int> r = [1,5,7,3,4,8];
+    r..sort((a,b) => b.compareTo(a));
+    print(r);
     paddingbottom = 100.0;
     Random random = new Random();
     currentShapePositions = shapepositions[random.nextInt(shapepositions.length)];
@@ -92,15 +95,18 @@ class _MyHomePageState extends State<MyHomePage> {
         if ((currentShapePositions[rotationint][3]+currentrootposition+10) <120 ){
           currentrootposition +=10;
             bool landed = false;
+          setState(() {
             currentShapePositions[rotationint].forEach((v) {
-              if (!landed && taken2[((v+currentrootposition)/10).floor()].contains((v+currentrootposition)%10)){
+              if (!landed && taken2[((v + currentrootposition) / 10).floor()].contains((v + currentrootposition) % 10)) {
+                print("hi 1");
                 landed = true;
                 nextbox();
               }
             });
-
+          });
         if (!landed && currentShapePositions[rotationint][3]+currentrootposition >109){
           boxes2 = [];
+          print("hi 2");
           setState(() {
             currentShapePositions[rotationint].forEach((val) {
               boxes2.add(val + currentrootposition);
@@ -137,8 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
   nextbox() {
     Random random = new Random();
     currentShapePositions = shapepositions[random.nextInt(shapepositions.length-1)];
-    setState(() {
-      //taken.addAll(boxes2);
+
       List<int> checkrepeats = [];
       List<int> erasetheserows = [];
       boxes2.forEach((val) {
@@ -147,13 +152,12 @@ class _MyHomePageState extends State<MyHomePage> {
           filledboxesperrow[(val / 10).floor()] += 1;
           checkrepeats.add(val);
           if (filledboxesperrow[(val / 10).floor()] == 10) {
-            // filledboxesperrow[(val/10).floor()] =0;
             erasetheserows.add((val / 10).floor());
-            //eraserow(filledboxesperrow[(val / 10).floor()]);
             print((val / 10).floor());
           }
         }
       });
+    setState(() {
       if (erasetheserows.isNotEmpty) eraserows(erasetheserows);
       currentrootposition = initrootposition;
       rotationint = 0;
@@ -166,16 +170,16 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
         filledboxesperrow.removeRange(rownums.first, rownums.last);
         filledboxesperrow.insertAll(0, List.generate(rownums.length, (i) =>0));
+        //taken2.removeRange(rownums.first, rownums.last);
+        rownums.sort((a,b) => b.compareTo(a));
+        rownums.forEach((rownum) {
+          taken2.removeAt(rownum);
+        });
+        
 
-      //  print(taken2.last);
-        print(rownums.first);
-        print(rownums.last);
-        taken2.removeRange(rownums.first, rownums.last);
         taken2.insertAll(0, List.generate(rownums.length, (i) =>[]));
-    print("taken2");
-    print(taken2);
-    print("filledboxes");
-    print(filledboxesperrow);
+        print(taken2);
+
     });
   }
   @override
