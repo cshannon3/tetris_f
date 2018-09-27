@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'model.dart';
+import 'dart:math';
+
 
 void main() => runApp(new MyApp());
 
@@ -13,7 +16,6 @@ class MyApp extends StatelessWidget {
       ),
       home: new Scaffold(
       appBar: new AppBar(
-
     ),
     body: new MyHomePage(),
       ),
@@ -32,26 +34,76 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double paddingtop;
   double paddingbottom;
-  List<int> highlightedboxes;
-  bool hitbottom = false;
-  bool hitleft = false;
-  bool hitright = false;
-  bool hittop = false;
-
-
+  int rootposition = 15;
+  int rotationint = 0;
+  List<int> boxes2 = [];
+  List<int> taken = [];
+  List<List<int>> currentShapePositions;
 
   @override
   void initState() {
     paddingtop = 100.0;
     paddingbottom = 100.0;
-    highlightedboxes = [11,21,31];
+    Random random = new Random();
+    currentShapePositions = shapepositions[random.nextInt(shapepositions.length-1)];
 
+    refreshboxes2(Movement.init);
+  }
+  nextbox() {
+    Random random = new Random();
+    currentShapePositions = shapepositions[random.nextInt(shapepositions.length-1)];
+    setState(() {
+      taken.addAll(boxes2);
+      rootposition = 15;
+      rotationint = 0;
+    });
   }
 
+  refreshboxes2(Movement m) {
+    switch (m) {
+      case (Movement.right):
+        if ((currentShapePositions[rotationint][1]+rootposition+1)%10 !=0 ){
+          rootposition +=1;
+        }
+        break;
+      case (Movement.left):
+        if ((currentShapePositions[rotationint][0]+rootposition)%10 !=0 ){
+          rootposition -=1;
+        }
+        break;
+      case (Movement.up):
+        if ((currentShapePositions[rotationint][2]+rootposition-10)>0 ){
+          rootposition -=10;
+        }
+        break;
+      case (Movement.down):
+        if ((currentShapePositions[rotationint][3]+rootposition+10) <120 ){
+          rootposition +=10;
+          if (currentShapePositions[rotationint][3]+rootposition >109){
+            boxes2 = [];
+            setState(() {
+              currentShapePositions[rotationint].forEach((val) {
+                boxes2.add(val + rootposition);
+              });
+            });
+            nextbox();
+          }
+        }
+        break;
+      case (Movement.rotate):
+        break;
+      default:
+        break;
+    }
+    boxes2 = [];
+    setState(() {
+      currentShapePositions[rotationint].forEach((val) {
+        boxes2.add(val + rootposition);
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
-    
-   
     return  new Column(
       children: <Widget>[
         Expanded(
@@ -69,7 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: List.generate(120, (index) {
                   return Container(
                     decoration: BoxDecoration(
-                      color: highlightedboxes.contains(index)? Colors.green: Colors.grey,
+                      color: boxes2.contains(index) ?
+                        Colors.red
+                       : taken.contains(index) ?
+                        Colors.green :
+                      Colors.grey,
                       borderRadius: BorderRadius.circular(3.0),
                       border: Border.all(color: Colors.black)
                     ),
@@ -97,38 +153,19 @@ class _MyHomePageState extends State<MyHomePage> {
               IconButton(
                 icon: Icon(Icons.arrow_back_ios),
                 onPressed: () {
-                  List<int> newboxpositions = [];
-                  highlightedboxes.forEach((boxval) {
-                    if (hitleft || (boxval-1)%10 == 0 ){
-                      hitleft = true;
-                    } else {
-                      newboxpositions.add(boxval-1);
-                    }
+                  setState(() {
+                    refreshboxes2(Movement.left);
                   });
-                  if (!hitleft) {
-                    setState(() {
-                      highlightedboxes = newboxpositions;
-                    });
-                  }
                 },
                 iconSize: 40.0,
               ),
               IconButton(
                 icon: Icon(Icons.arrow_upward),
                 onPressed: () {
-                    List<int> newboxpositions = [];
-                    highlightedboxes.forEach((boxval) {
-                      if (hittop || boxval - 10 < 0){
-                        hittop = true;
-                      } else {
-                        newboxpositions.add(boxval - 10);
-                      }
-                    });
-                    if (!hittop) {
-                      setState(() {
-                        highlightedboxes = newboxpositions;
-                      });
-                    }
+                  setState(() {
+                    refreshboxes2(Movement.up);
+                  });
+
                 },
                 color: Colors.green,
                 iconSize: 40.0,
@@ -137,15 +174,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: Icon(Icons.refresh),
                 onPressed: () {
                   setState(() {
-
-                    if (highlightedboxes[1] -highlightedboxes[0]>1 ){
-                    highlightedboxes[0] = highlightedboxes[1] -1;
-                    highlightedboxes[2] = highlightedboxes[1]+1;
-                  }else{
-                    highlightedboxes[0] = highlightedboxes[1] -10;
-                    highlightedboxes[2] = highlightedboxes[1]+10;
-                  }
-                    });
+                    if (currentShapePositions.length> rotationint+1) {
+                      rotationint+=1;
+                    }else{
+                      rotationint = 0;
+                    }
+                    refreshboxes2(Movement.rotate);
+                  });
 
                 },
                 color: Colors.green,
@@ -154,40 +189,19 @@ class _MyHomePageState extends State<MyHomePage> {
               IconButton(
                 icon: Icon(Icons.arrow_downward),
                 onPressed: () {
-                  List<int> newboxpositions = [];
-                  highlightedboxes.forEach((boxval) {
-                    if (hitbottom || boxval + 10 > 120){
-                      hitbottom = true;
-                    } else {
-                      newboxpositions.add(boxval + 10);
-                    }
+                  setState(() {
+                    refreshboxes2(Movement.down);
                   });
-                  if (!hitbottom) {
-                    setState(() {
-                      highlightedboxes = newboxpositions;
-                    });
-                  }
                 },
                 iconSize: 40.0,
               ),
               IconButton(
                 icon: Icon(Icons.arrow_forward_ios),
                 onPressed: () {
-                  List<int> newboxpositions = [];
-                  highlightedboxes.forEach((boxval) {
-                    if (hitright || (boxval+1)%10 == 0 ){
-                      hitright = true;
-                    } else {
-                      newboxpositions.add(boxval+1);
-                    }
+                  setState(() {
+                    refreshboxes2(Movement.right);
                   });
-                  if (!hitright) {
-                    setState(() {
-                      highlightedboxes = newboxpositions;
-                    });
-                  }
                 },
-
                 iconSize: 40.0,
               ),
             ],
@@ -197,5 +211,24 @@ class _MyHomePageState extends State<MyHomePage> {
    
       
     );
+  }
+}
+
+
+enum Movement {
+  left,
+  right,
+  up,
+  down,
+  rotate,
+  init,
+}
+
+
+class boardTile extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container();
   }
 }
